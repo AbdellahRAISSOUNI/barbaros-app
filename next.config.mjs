@@ -8,19 +8,16 @@ const nextConfig = {
     // Disable TypeScript checking during build for now
     ignoreBuildErrors: true,
   },
-  // Fix for client-reference-manifest.js error
-  experimental: {
-    serverComponentsExternalPackages: [],
-    optimizePackageImports: []
-  },
+  // Disable experimental features
+  experimental: {},
   // Disable image optimization warnings
   images: {
     unoptimized: true,
   },
   // Disable strict mode for now
   reactStrictMode: false,
-  // Use the older output format
-  output: 'export',
+  // Don't use static export as it doesn't support API routes
+  // output: 'export',
 };
 
 export default nextConfig; 
