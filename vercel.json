@@ -1,0 +1,25 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next",
+      "config": {
+        "buildCommand": "npm run build",
+        "outputDirectory": ".next"
+      }
+    }
+  ],
+  "env": {
+    "MONGODB_URI": "mongodb+srv://abdellah:abdellah123@barbaros.ofzfjah.mongodb.net/barbaros",
+    "NEXTAUTH_URL": "https://barbaros-app.vercel.app",
+    "NEXTAUTH_SECRET": "your-secret-key-change-this-in-production",
+    "NODE_ENV": "production"
+  },
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ]
+} 
