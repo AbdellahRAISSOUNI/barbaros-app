@@ -3,6 +3,11 @@ import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
 export async function middleware(request: NextRequest) {
+  // For static export, we need to handle API routes differently
+  if (request.nextUrl.pathname.startsWith('/api/')) {
+    return NextResponse.next();
+  }
+
   const token = await getToken({ req: request });
   
   const isAdminRoute = request.nextUrl.pathname.startsWith('/admin');
