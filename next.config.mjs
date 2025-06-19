@@ -8,12 +8,16 @@ const nextConfig = {
     // Disable TypeScript checking during build for now
     ignoreBuildErrors: true,
   },
-  experimental: {
-    // Enable server actions as an object
-    serverActions: {
-      allowedOrigins: ["localhost:3000", "barbaros-app.vercel.app"],
-    },
+  // Disable server actions for now to avoid compatibility issues
+  experimental: {},
+  // Enable static optimization where possible
+  output: 'standalone',
+  // Disable image optimization warnings
+  images: {
+    unoptimized: true,
   },
+  // Disable strict mode for now
+  reactStrictMode: false,
 };
 
 export default nextConfig; 
