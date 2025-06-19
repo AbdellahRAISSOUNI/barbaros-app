@@ -10,15 +10,18 @@ interface Visit {
 }
 
 interface ClientInfo {
-  id: string;
-  name: string;
+  _id: string;
+  clientId: string;
+  firstName: string;
+  lastName: string;
   email: string;
-  phone?: string;
-  visitsCount: number;
-  visitsRequired: number;
-  lastVisit?: string;
-  recentVisits: Visit[];
-  rewards: number;
+  phoneNumber?: string;
+  visitCount: number;
+  rewardsEarned: number;
+  rewardsRedeemed: number;
+  qrCodeUrl: string;
+  lastVisit?: Date;
+  accountActive: boolean;
 }
 
 interface ClientInfoCardProps {
@@ -35,6 +38,7 @@ export function ClientInfoCard({
   const [clientInfo, setClientInfo] = useState<ClientInfo | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [recentVisits, setRecentVisits] = useState<Visit[]>([]);
 
   useEffect(() => {
     const fetchClientInfo = async () => {
@@ -42,8 +46,7 @@ export function ClientInfoCard({
         setIsLoading(true);
         setError(null);
         
-        // In a real implementation, this would be an API call to get client info
-        // For now, we'll simulate a fetch with a timeout
+        // Fetch client information
         const response = await fetch(`/api/clients/${clientId}`);
         
         if (!response.ok) {
@@ -51,7 +54,11 @@ export function ClientInfoCard({
         }
         
         const data = await response.json();
-        setClientInfo(data.client);
+        setClientInfo(data);
+        
+        // For now, we'll use empty recent visits
+        // In a real implementation, you would fetch recent visits from an API
+        setRecentVisits([]);
       } catch (err) {
         console.error('Error fetching client info:', err);
         setError('Failed to load client information');
@@ -66,8 +73,10 @@ export function ClientInfoCard({
   }, [clientId]);
 
   // Calculate loyalty progress percentage
+  // Assuming 10 visits required for a reward
+  const visitsRequired = 10;
   const progressPercentage = clientInfo 
-    ? Math.min(Math.round((clientInfo.visitsCount / clientInfo.visitsRequired) * 100), 100)
+    ? Math.min(Math.round((clientInfo.visitCount / visitsRequired) * 100), 100)
     : 0;
 
   if (isLoading) {
@@ -119,8 +128,8 @@ export function ClientInfoCard({
             <FaUser className="text-gray-600" />
           </div>
           <div>
-            <p className="font-medium">{clientInfo.name}</p>
-            <p className="text-sm text-gray-500">Client ID: {clientInfo.id.slice(0, 8)}...</p>
+            <p className="font-medium">{clientInfo.firstName} {clientInfo.lastName}</p>
+            <p className="text-sm text-gray-500">Client ID: {clientInfo.clientId}</p>
           </div>
         </div>
         
@@ -130,10 +139,10 @@ export function ClientInfoCard({
             <span className="text-sm">{clientInfo.email}</span>
           </div>
           
-          {clientInfo.phone && (
+          {clientInfo.phoneNumber && (
             <div className="flex items-center">
               <FaPhone className="text-gray-500 mr-2" />
-              <span className="text-sm">{clientInfo.phone}</span>
+              <span className="text-sm">{clientInfo.phoneNumber}</span>
             </div>
           )}
         </div>
@@ -144,8 +153,8 @@ export function ClientInfoCard({
         <h3 className="text-sm font-medium text-gray-700 mb-2">Loyalty Progress</h3>
         <div className="mb-2">
           <div className="flex justify-between text-xs mb-1">
-            <span>{clientInfo.visitsCount} visits</span>
-            <span>{clientInfo.visitsRequired} visits for reward</span>
+            <span>{clientInfo.visitCount} visits</span>
+            <span>{visitsRequired} visits for reward</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div 
@@ -155,13 +164,13 @@ export function ClientInfoCard({
           </div>
         </div>
         
-        {clientInfo.visitsCount >= clientInfo.visitsRequired ? (
+        {clientInfo.visitCount >= visitsRequired ? (
           <div className="bg-green-100 text-green-800 p-2 rounded-md text-sm text-center">
-            Client has earned a free haircut!
+            Client has earned a free service!
           </div>
         ) : (
           <p className="text-sm text-gray-600">
-            {clientInfo.visitsRequired - clientInfo.visitsCount} more visits until free haircut
+            {visitsRequired - clientInfo.visitCount} more visits until free service
           </p>
         )}
       </div>
@@ -169,9 +178,9 @@ export function ClientInfoCard({
       {/* Recent Visits */}
       <div className="mb-4">
         <h3 className="text-sm font-medium text-gray-700 mb-2">Recent Visits</h3>
-        {clientInfo.recentVisits.length > 0 ? (
+        {recentVisits.length > 0 ? (
           <ul className="divide-y divide-gray-200">
-            {clientInfo.recentVisits.map((visit) => (
+            {recentVisits.map((visit) => (
               <li key={visit.id} className="py-2">
                 <div className="flex items-center">
                   <div className="p-2 rounded-full bg-gray-100 mr-3">
@@ -203,9 +212,9 @@ export function ClientInfoCard({
           </div>
           <div>
             <p className="text-sm font-medium">
-              {clientInfo.rewards} available rewards
+              {clientInfo.rewardsEarned - clientInfo.rewardsRedeemed} available rewards
             </p>
-            {clientInfo.rewards > 0 && (
+            {(clientInfo.rewardsEarned - clientInfo.rewardsRedeemed) > 0 && (
               <p className="text-xs text-gray-500">
                 Client can redeem rewards
               </p>
@@ -225,4 +234,4 @@ export function ClientInfoCard({
       </div>
     </div>
   );
-} 
+}

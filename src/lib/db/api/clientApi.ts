@@ -29,16 +29,23 @@ export async function createClient(clientData: Partial<IClient>) {
 }
 
 /**
- * Get client by ID
+ * Get client by ID (MongoDB _id)
  */
 export async function getClientById(id: string) {
   try {
     await connectToDatabase();
+    // Check if the id is a valid MongoDB ObjectId format
+    // If not, return null instead of throwing an error
+    // This allows the route handler to try getClientByClientId instead
+    if (!/^[0-9a-fA-F]{24}$/.test(id)) {
+      return null;
+    }
     const client = await Client.findById(id);
     return client;
   } catch (error: any) {
     console.error('Error getting client:', error);
-    throw new Error(`Failed to get client: ${error.message}`);
+    // Return null instead of throwing to allow fallback to getClientByClientId
+    return null;
   }
 }
 
@@ -204,4 +211,4 @@ export async function searchClients(query: string, page = 1, limit = 10) {
     console.error('Error searching clients:', error);
     throw new Error(`Failed to search clients: ${error.message}`);
   }
-} 
+}

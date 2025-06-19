@@ -18,48 +18,65 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const email = searchParams.get('email');
     const phone = searchParams.get('phone');
+    const q = searchParams.get('q'); // General search query
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '10');
     
-    if (!email && !phone) {
-      return NextResponse.json(
-        { error: 'Email or phone parameter is required' },
-        { status: 400 }
-      );
-    }
-    
-    // Search for clients
-    let searchQuery = '';
-    
-    if (email) {
-      searchQuery = email;
-    } else if (phone) {
-      searchQuery = phone;
-    }
-    
-    const result = await searchClients(searchQuery, 1);
-    
-    if (result.clients.length === 0) {
-      return NextResponse.json(
-        { message: 'No clients found' },
-        { status: 404 }
-      );
-    }
-    
-    // Return the first matching client
-    const client = result.clients[0];
-    
-    return NextResponse.json({
-      success: true,
-      client: {
-        id: client._id.toString(),
-        name: `${client.firstName} ${client.lastName}`,
-        email: client.email,
-        phone: client.phoneNumber,
-        clientId: client.clientId,
-        visitCount: client.visitCount,
-        rewardsEarned: client.rewardsEarned,
-        rewardsRedeemed: client.rewardsRedeemed
+    // If specific email or phone search is requested
+    if (email || phone) {
+      let searchQuery = '';
+      
+      if (email) {
+        searchQuery = email;
+      } else if (phone) {
+        searchQuery = phone;
       }
-    });
+      
+      const result = await searchClients(searchQuery, 1);
+      
+      if (result.clients.length === 0) {
+        return NextResponse.json(
+          { message: 'No clients found' },
+          { status: 404 }
+        );
+      }
+      
+      // Return the first matching client
+      const client = result.clients[0];
+      
+      return NextResponse.json({
+        success: true,
+        client: {
+          _id: client._id.toString(),
+          clientId: client.clientId,
+          firstName: client.firstName,
+          lastName: client.lastName,
+          email: client.email,
+          phoneNumber: client.phoneNumber,
+          visitCount: client.visitCount,
+          rewardsEarned: client.rewardsEarned,
+          rewardsRedeemed: client.rewardsRedeemed
+        }
+      });
+    }
+    
+    // General search with pagination (for the client management page)
+    if (q !== null) {
+      const result = await searchClients(q, page, limit);
+      
+      return NextResponse.json({
+        clients: result.clients,
+        totalClients: result.pagination.total,
+        totalPages: result.pagination.pages,
+        currentPage: page
+      });
+    }
+    
+    // If no search parameters are provided
+    return NextResponse.json(
+      { error: 'Search query parameter is required' },
+      { status: 400 }
+    );
   } catch (error) {
     console.error('Error searching for client:', error);
     return NextResponse.json(
@@ -67,4 +84,4 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}

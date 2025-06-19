@@ -38,8 +38,8 @@ export async function GET(
     }
     
     // Check if client already has a QR code ID
-    // If not, we'll use their clientId as the QR code ID
-    const qrCodeId = client.qrCodeId || client.clientId;
+    // Use the MongoDB _id for QR code to ensure proper scanning
+    const qrCodeId = client.qrCodeId || client._id;
     
     // Generate QR code
     const qrCodeDataUrl = await generateQRCodeDataURL(qrCodeId);
@@ -102,8 +102,8 @@ export async function POST(
       );
     }
     
-    // Generate a new QR code ID
-    const newQrCodeId = `${client.clientId}-${Date.now()}`;
+    // Generate a new QR code ID based on MongoDB _id
+    const newQrCodeId = client._id;
     
     // Generate QR code
     const qrCodeDataUrl = await generateQRCodeDataURL(newQrCodeId);
