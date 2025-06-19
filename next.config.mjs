@@ -8,10 +8,9 @@ const nextConfig = {
     // Disable TypeScript checking during build for now
     ignoreBuildErrors: true,
   },
-  // Disable server actions for now to avoid compatibility issues
+  // Disable experimental features
   experimental: {},
-  // Enable static optimization where possible
-  output: 'standalone',
+  // Use the default output
   // Disable image optimization warnings
   images: {
     unoptimized: true,
