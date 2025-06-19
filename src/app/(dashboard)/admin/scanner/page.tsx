@@ -199,7 +199,7 @@ export default function ScannerPage() {
               <span className="text-green-800">{successMessage}</span>
             </div>
           )}
-
+          
           {/* Client Info Card */}
           <ClientInfoCard 
             clientId={foundClientId}
@@ -271,9 +271,9 @@ export default function ScannerPage() {
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           {scanMode === 'camera' && (
             <div className="p-6">
-              <QRCodeScanner 
-                onScanSuccess={handleClientFound}
-                onScanError={handleScanError}
+            <QRCodeScanner 
+              onScanSuccess={handleClientFound}
+              onScanError={handleScanError}
                 className="w-full"
               />
             </div>
@@ -322,10 +322,10 @@ export default function ScannerPage() {
 
           {scanMode === 'manual' && (
             <div className="p-6">
-              <ClientLookup 
-                onClientFound={handleClientFound}
-                onError={handleScanError}
-              />
+            <ClientLookup 
+              onClientFound={handleClientFound}
+              onError={handleScanError}
+            />
             </div>
           )}
         </div>
@@ -386,8 +386,8 @@ export default function ScannerPage() {
                 <p>• You can also search by client ID</p>
                 <p>• Type at least 2 characters to start searching</p>
                 <p>• Select the correct client from the results</p>
-              </>
-            )}
+        </>
+      )}
           </div>
         </div>
       </div>
